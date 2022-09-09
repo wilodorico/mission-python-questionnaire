@@ -1,45 +1,23 @@
-# PROJET QUESTIONNAIRE V3 : POO
-#
-# - Pratiquer sur la POO
-# - Travailler sur du code existant
-# - Mener un raisonnement
-#
-# -> Définir les entitées (données, actions)
-#
-# Question
-#    - titre       - str
-#    - choix       - (str)
-#    - bonne_reponse   - str
-#
-#    - poser()  -> bool
-#
-# Questionnaire
-#    - questions      - (Question)
-#
-#    - lancer()
-#
+import json
+
+questionnaire = open("animaux_animauxenvrac_debutant.json")
+questionnaire_json = json.load(questionnaire)
 
 class Question:
-    def __init__(self, titre, choix, bonne_reponse):
+    def __init__(self, titre, choix):
         self.titre = titre
         self.choix = choix
-        self.bonne_reponse = bonne_reponse
-
-    def FromData(data):
-        # ....
-        q = Question(data[2], data[0], data[1])
-        return q
 
     def poser(self):
-        print("QUESTION")
+        print()
         print("  " + self.titre)
         for i in range(len(self.choix)):
-            print("  ", i+1, "-", self.choix[i])
+            print("  ", i+1, "-", self.choix[i][0])
 
         print()
         resultat_response_correcte = False
         reponse_int = Question.demander_reponse_numerique_utlisateur(1, len(self.choix))
-        if self.choix[reponse_int-1].lower() == self.bonne_reponse.lower():
+        if self.choix[reponse_int-1][1] == True:
             print("Bonne réponse")
             resultat_response_correcte = True
         else:
@@ -60,40 +38,32 @@ class Question:
             print("ERREUR : Veuillez rentrer uniquement des chiffres")
         return Question.demander_reponse_numerique_utlisateur(min, max)
     
+
 class Questionnaire:
     def __init__(self, questions):
         self.questions = questions
 
     def lancer(self):
         score = 0
-        for question in self.questions:
-            if question.poser():
+        num_question = 0
+        print()
+        print(f"Titre : {self.questions['titre']}")
+        print(f"Catégorie : {self.questions['categorie']}")
+        print(f"Niveau : {self.questions['difficulte']}")
+        print(f"Total : {len(self.questions['questions'])} questions")
+        print()
+
+        for question in self.questions["questions"]:
+            num_question += 1
+            print(f"n°{num_question}/{len(self.questions['questions'])} :")
+            q = Question(question['titre'], question['choix'])
+            if q.poser():
                 score += 1
-        print("Score final :", score, "sur", len(self.questions))
+        print("Score final :", score, "sur", len(self.questions['questions']))
+        print()
         return score
-
-
-"""questionnaire = (
-    ("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
-    ("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
-    ("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
-                )
-
-lancer_questionnaire(questionnaire)"""
-
-# q1 = Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris")
-# q1.poser()
-
-# data = (("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris", "Quelle est la capitale de la France ?")
-# q = Question.FromData(data)
-# print(q.__dict__)
+    
 
 Questionnaire(
-    (
-    Question("Quelle est la capitale de la France ?", ("Marseille", "Nice", "Paris", "Nantes", "Lille"), "Paris"), 
-    Question("Quelle est la capitale de l'Italie ?", ("Rome", "Venise", "Pise", "Florence"), "Rome"),
-    Question("Quelle est la capitale de la Belgique ?", ("Anvers", "Bruxelles", "Bruges", "Liège"), "Bruxelles")
-    )
+    questionnaire_json
 ).lancer()
-
-
